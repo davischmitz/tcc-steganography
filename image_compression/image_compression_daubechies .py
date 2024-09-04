@@ -10,9 +10,19 @@ compressão de imagem -> reduzir o tamanho do arquivo de imagem, tornando-o mais
 import pywt
 import numpy as np
 import cv2
+import os
+
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Carregar a imagem
-imagem = cv2.imread('lena.jpg', 0)
+image_path = os.path.join(script_dir, 'lena.JPG')
+if not os.path.exists(image_path):
+    raise FileNotFoundError(f"Image file '{image_path}' not found.")
+
+imagem = cv2.imread(image_path, 0)
+if imagem is None or len(imagem.shape) < 2:
+    raise ValueError("Failed to load image or image does not have at least 2 dimensions.")
 
 # Definir a wavelet a ser utilizada (Daubechies)
 wavelet = 'db4'
