@@ -50,8 +50,8 @@ def save_image_to_file(image, filepath, figsize=None):
     fig.savefig(filepath)
 
 
-encoding_wavelet = "sym8"
-decoding_wavelet = "sym8"
+encoding_wavelet = "haar"
+decoding_wavelet = "haar"
 
 plot_rows = 4
 plot_columns = 4
@@ -122,9 +122,9 @@ print(Pr.shape, Dr.shape, Qr.shape)  # just for debugging
 
 # 6) Embed the hidden information into the 'D' parameters of the cover image
 
-S_wimgr = Dr + (0.05 * D1r)
-S_wimgg = Dg + (0.05 * D1g)
-S_wimgb = Db + (0.05 * D1b)
+S_wimgr = Dr + (0.02 * D1r)
+S_wimgg = Dg + (0.02 * D1g)
+S_wimgb = Db + (0.02 * D1b)
 
 # 7) Reconstruct the coefficient matrix from the embedded SVD parameters
 
@@ -198,9 +198,9 @@ PPb, PDb, PQb = np.linalg.svd(PcAb, full_matrices=False)
 
 # 13) Reverse the information embedded in the 'D' parameter of the cover image in step 5 through the inverse operation
 # subtract from R,G,B channels values of cover image
-S_ewatr = (PDr - Dr) / 0.05
-S_ewatg = (PDg - Dg) / 0.05
-S_ewatb = (PDb - Db) / 0.05
+S_ewatr = (PDr - Dr) / 0.02
+S_ewatg = (PDg - Dg) / 0.02
+S_ewatb = (PDb - Db) / 0.02
 
 # 14) Combine the approximations with the hidden SVD values to reconstruct the hidden image
 ewatr = np.dot(P1r * S_ewatr, Q1r)
@@ -249,4 +249,6 @@ plt.close()
 save_image_to_file(wimghd, "stego.tif", figsize=(float(w) / 100, float(h) / 100))
 
 # save decoded hidden image to filesystem
-save_image_to_file(hidden_rgb, "hidden_rgb.tif", figsize=(7.20, 4.80))
+save_image_to_file(
+    hidden_rgb, "hidden_rgb.tif", figsize=(float(w) / 100, float(h) / 100)
+)
