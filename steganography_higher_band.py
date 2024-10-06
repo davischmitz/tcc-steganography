@@ -297,7 +297,6 @@ def main(
         ),
     )
 
-    # Print the dimensions of the images before cropping
     print(f"Cover image dimensions: {cover_image.shape}")
     print(f"Hidden image dimensions: {hidden_image.shape}")
     print(f"Stego image dimensions: {stego_image.shape}")
@@ -342,7 +341,7 @@ def main(
 
     print(f"Results saved to {csv_filename}")
 
-    # Display the images
+    # Compare cover and stego images
     fig, axes = plt.subplots(1, 2, figsize=(10, 5))
     axes[0].imshow(cover_image, cmap="gray")
     axes[0].set_title("Original Image")
