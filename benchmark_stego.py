@@ -9,7 +9,7 @@ wavelet_types = ["haar", "db1", "db8", "db16", "sym2", "sym8", "sym16"]
 
 cover_image_path = "lena_std.tif"
 hidden_image_path = "qrcode_compact_512x512.tif"
-stego_image_path = "stego_image.tif"
+stego_image_path = "stego.tif"
 
 # Define the embedding scale
 embed_scale = 0.02  # You can adjust this value as needed
@@ -43,7 +43,7 @@ for wavelet_type in wavelet_types:
             "--original_image",
             cover_image_path,
             "--stego_image",
-            "stego.tif",
+            stego_image_path,
         ],
         check=True,
     )
