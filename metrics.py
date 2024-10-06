@@ -2,21 +2,18 @@ import numpy as np
 from skimage.io import imread
 import math
 import matplotlib.pyplot as plt
-
+import csv
 
 def calculate_mse(image1, image2):
     return np.mean((image1 - image2) ** 2)
 
-
 def calculate_psnr(image1, image2):
     mse = calculate_mse(image1, image2)
-    print(f"MSE: {mse}")
     if mse == 0:
         return float("inf")
     max_pixel = 255.0
     psnr = 10 * math.log10(max_pixel**2 / mse)
     return psnr
-
 
 # Read the original and stego images
 original_image = imread("lena_std.tif")
@@ -39,9 +36,20 @@ min_width = min(original_image.shape[1], stego_image.shape[1])
 original_cropped = original_image[:min_height, :min_width]
 stego_cropped = stego_image[:min_height, :min_width]
 
-# Calculate PSNR
+# Calculate MSE and PSNR
+mse_value = calculate_mse(original_cropped, stego_cropped)
 psnr_value = calculate_psnr(original_cropped, stego_cropped)
+print(f"MSE between the original and stego image: {mse_value}")
 print(f"PSNR between the original and stego image: {psnr_value} dB")
+
+# Save results to a CSV file
+csv_filename = "image_metrics.csv"
+with open(csv_filename, mode='w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(["Original Image", "Stego Image", "Original Image Dimensions", "Stego Image Dimensions", "MSE", "PSNR"])
+    writer.writerow(["lena_std.tif", "stego.tif", original_image.shape, stego_image.shape, mse_value, psnr_value])
+
+print(f"Results saved to {csv_filename}")
 
 # Display the images
 fig, axes = plt.subplots(1, 2, figsize=(10, 5))
