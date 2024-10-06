@@ -24,6 +24,8 @@ for wavelet_type in wavelet_types:
             cover_image_path,
             "--hidden_image",
             hidden_image_path,
+            "--stego_image",
+            stego_image_path,
             "--wavelet_type",
             wavelet_type,
             "--embed_scale",
@@ -32,19 +34,3 @@ for wavelet_type in wavelet_types:
         check=True,
     )
     print(f"Steganography script completed for wavelet type: {wavelet_type}.")
-
-    print("Running metrics script...")
-    metrics_process = subprocess.run(
-        [
-            "python3",
-            metrics_script,
-            "--wavelet_type",
-            wavelet_type,
-            "--original_image",
-            cover_image_path,
-            "--stego_image",
-            stego_image_path,
-        ],
-        check=True,
-    )
-    print("Metrics script completed.")

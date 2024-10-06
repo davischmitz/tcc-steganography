@@ -4,6 +4,9 @@ from matplotlib import pyplot as plt
 import cv2
 from skimage.transform import resize
 import argparse
+import math
+import csv
+import os
 
 
 def load_and_convert_to_rgb(image_path):
@@ -59,8 +62,27 @@ def save_image(image, file_path, size=None):
     ax.imshow(image, aspect="auto")
     fig.savefig(file_path)
 
+    ####################################################
+    # METRICS
+    ####################################################
 
-def main(wavelet_type, embed_scale, cover_image_path, hidden_image_path):
+
+def calculate_mse(image1, image2):
+    return np.mean((image1 - image2) ** 2)
+
+
+def calculate_psnr(image1, image2):
+    mse = calculate_mse(image1, image2)
+    if mse == 0:
+        return float("inf")
+    max_pixel = 255.0
+    psnr = 10 * math.log10(max_pixel**2 / mse)
+    return psnr
+
+
+def main(
+    wavelet_type, embed_scale, cover_image_path, hidden_image_path, stego_image_path
+):
     # Configuration
     rows, cols = 4, 4
 
@@ -261,7 +283,7 @@ def main(wavelet_type, embed_scale, cover_image_path, hidden_image_path):
     # Save stego image
     save_image(
         stego_image,
-        "stego.tif",
+        stego_image_path,
         size=(float(stego_image.shape[1]) / 100, float(stego_image.shape[0]) / 100),
     )
 
@@ -274,6 +296,63 @@ def main(wavelet_type, embed_scale, cover_image_path, hidden_image_path):
             float(extracted_hidden_image.shape[0]) / 100,
         ),
     )
+
+    # Print the dimensions of the images before cropping
+    print(f"Cover image dimensions: {cover_image.shape}")
+    print(f"Hidden image dimensions: {hidden_image.shape}")
+    print(f"Stego image dimensions: {stego_image.shape}")
+
+    # Calculate MSE and PSNR
+    mse_value = calculate_mse(cover_image, stego_image)
+    psnr_value = calculate_psnr(cover_image, stego_image)
+    print(f"MSE between the original and stego image: {mse_value}")
+    print(f"PSNR between the original and stego image: {psnr_value} dB")
+
+    # Save results to a CSV file
+    csv_filename = "image_metrics.csv"
+    file_exists = os.path.isfile(csv_filename)
+
+    with open(csv_filename, mode="a", newline="") as file:
+        writer = csv.writer(file)
+        if not file_exists:
+            writer.writerow(
+                [
+                    "Original Image",
+                    "Stego Image",
+                    "Original Image Dimensions",
+                    "Stego Image Dimensions",
+                    "Wavelet",
+                    "Embedding Scale",
+                    "MSE",
+                    "PSNR",
+                ]
+            )
+        writer.writerow(
+            [
+                cover_image_path,
+                hidden_image_path,
+                cover_image.shape,
+                stego_image.shape,
+                wavelet_type,
+                embed_scale,
+                mse_value,
+                psnr_value,
+            ]
+        )
+
+    print(f"Results saved to {csv_filename}")
+
+    # Display the images
+    fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+    axes[0].imshow(cover_image, cmap="gray")
+    axes[0].set_title("Original Image")
+    axes[0].axis("off")
+
+    axes[1].imshow(stego_image, cmap="gray")
+    axes[1].set_title("Stego Image")
+    axes[1].axis("off")
+
+    # plt.show()
 
 
 if __name__ == "__main__":
@@ -292,6 +371,18 @@ if __name__ == "__main__":
     parser.add_argument(
         "--hidden_image", type=str, required=True, help="Path to the hidden image."
     )
+    parser.add_argument(
+        "--stego_image",
+        type=str,
+        required=True,
+        help="Path to save the stego image.",
+    )
     args = parser.parse_args()
 
-    main(args.wavelet_type, args.embed_scale, args.cover_image, args.hidden_image)
+    main(
+        args.wavelet_type,
+        args.embed_scale,
+        args.cover_image,
+        args.hidden_image,
+        args.stego_image,
+    )
