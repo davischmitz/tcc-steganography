@@ -5,10 +5,6 @@ import cv2
 from skimage.transform import resize
 import argparse
 
-####################################################
-# ENCODING PROCESS
-####################################################
-
 
 def load_and_convert_to_rgb(image_path):
     image = cv2.imread(image_path)
@@ -64,13 +60,13 @@ def save_image(image, file_path, size=None):
     fig.savefig(file_path)
 
 
-def main(wavelet_type, embed_scale):
+def main(wavelet_type, embed_scale, cover_image_path, hidden_image_path):
     # Configuration
     rows, cols = 4, 4
 
     # Load images
-    cover_image = load_and_convert_to_rgb("lena_std.tif")
-    hidden_image = load_and_convert_to_rgb("qrcode_compact_512x512.tif")
+    cover_image = load_and_convert_to_rgb(cover_image_path)
+    hidden_image = load_and_convert_to_rgb(hidden_image_path)
 
     # Crop images to the same size
     print(f"Cover image dimensions: {cover_image.shape}")
@@ -83,6 +79,10 @@ def main(wavelet_type, embed_scale):
     # Display cover and hidden images
     display_image_subplot(cover_image, 2, "Cover Image", rows, cols)
     display_image_subplot(hidden_image, 3, "Image to Hide", rows, cols)
+
+    ####################################################
+    # ENCODING PROCESS
+    ####################################################
 
     # Separate RGB channels
     cover_red, cover_green, cover_blue = (
@@ -256,7 +256,7 @@ def main(wavelet_type, embed_scale):
     display_image_subplot(
         extracted_hidden_image, 15, "Extracted Hidden Image", rows, cols
     )
-    plt.show()
+    # plt.show()
 
     # Save stego image
     save_image(
@@ -281,11 +281,17 @@ if __name__ == "__main__":
         description="Steganography using higher band signals."
     )
     parser.add_argument(
-        "--wavelet_type", type=str, default="haar", help="Type of wavelet to use."
+        "--wavelet_type", type=str, required=True, help="Type of wavelet to use."
     )
     parser.add_argument(
-        "--embed_scale", type=float, default=0.02, help="Embedding scale factor."
+        "--embed_scale", type=float, required=True, help="Embedding scale factor."
+    )
+    parser.add_argument(
+        "--cover_image", type=str, required=True, help="Path to the cover image."
+    )
+    parser.add_argument(
+        "--hidden_image", type=str, required=True, help="Path to the hidden image."
     )
     args = parser.parse_args()
 
-    main(args.wavelet_type, args.embed_scale)
+    main(args.wavelet_type, args.embed_scale, args.cover_image, args.hidden_image)
