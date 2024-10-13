@@ -1,29 +1,57 @@
-Original Image,Stego Image,Original Image Dimensions,Stego Image Dimensions,Wavelet,Embedding Scale,MSE,PSNR
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",haar,0.02,0.5979665120442709,50.36403498019332
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",haar,0.05,1.3738911946614583,46.75128020742052
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",haar,0.1,4.33181635538737,41.76410324164044
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",haar,0.2,16.27404276529948,36.015849079579056
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db1,0.02,0.5979665120442709,50.36403498019332
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db1,0.05,1.3738911946614583,46.75128020742052
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db1,0.1,4.33181635538737,41.76410324164044
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db1,0.2,16.27404276529948,36.015849079579056
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db8,0.02,0.5319391886393229,50.87218374339631
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db8,0.05,0.8502642313639323,48.83526451164531
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db8,0.1,2.138153076171875,44.83041566563461
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db8,0.2,7.46475092569987,39.400650395501714
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db16,0.02,0.5283966064453125,50.90120341113171
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db16,0.05,0.8282725016276041,48.949071177024315
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db16,0.1,2.0545857747395835,45.00356083988205
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db16,0.2,7.140036265055339,39.59379943255122
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym2,0.02,0.5570182800292969,50.672109129373
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym2,0.05,1.0228563944498699,48.032656963403554
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym2,0.1,2.8387362162272134,43.59955322396083
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym2,0.2,10.248231252034506,38.02431444136219
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym8,0.02,0.5329742431640625,50.863741393122694
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym8,0.05,0.8498090108235677,48.837590291129956
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym8,0.1,2.134868621826172,44.837092068331046
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym8,0.2,7.441417694091797,39.414246782698875
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym16,0.02,0.5297991434733073,50.889691090303614
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym16,0.05,0.8274205525716146,48.95354056590767
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym16,0.1,2.0479812622070312,45.01754382078432
-lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym16,0.2,7.103818257649739,39.6158851883913
+Stego Strategy,Original Image,Stego Image,Original Image Dimensions,Stego Image Dimensions,Wavelet,Embedding Scale,MSE,PSNR
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",haar,0.02,13.317413330078125,36.88660481796723
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",haar,0.02,0.5979665120442709,50.36403498019332
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",haar,0.05,94.78099950154622,28.363590766805416
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",haar,0.05,1.3738911946614583,46.75128020742052
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",haar,0.1,395.6476084391276,22.157718159650774
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",haar,0.1,4.33181635538737,41.76410324164044
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",haar,0.2,1616.7117970784504,16.04447753511967
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",haar,0.2,16.27404276529948,36.015849079579056
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db1,0.02,13.317413330078125,36.88660481796723
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db1,0.02,0.5979665120442709,50.36403498019332
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db1,0.05,94.78099950154622,28.363590766805416
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db1,0.05,1.3738911946614583,46.75128020742052
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db1,0.1,395.6476084391276,22.157718159650774
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db1,0.1,4.33181635538737,41.76410324164044
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db1,0.2,1616.7117970784504,16.04447753511967
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db1,0.2,16.27404276529948,36.015849079579056
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db8,0.02,13.975591023763021,36.677101777311705
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db8,0.02,0.5319391886393229,50.87218374339631
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db8,0.05,99.24554824829102,28.163693256802432
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db8,0.05,0.8502642313639323,48.83526451164531
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db8,0.1,414.0229606628418,21.960559342091717
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db8,0.1,2.138153076171875,44.83041566563461
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db8,0.2,1691.2860107421875,15.848633041963772
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db8,0.2,7.46475092569987,39.400650395501714
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db16,0.02,14.545528411865234,36.5035085789131
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db16,0.02,0.5283966064453125,50.90120341113171
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db16,0.05,103.1668701171875,27.995401057789184
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db16,0.05,0.8282725016276041,48.949071177024315
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db16,0.1,430.27428436279297,21.793349699168154
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db16,0.1,2.0545857747395835,45.00356083988205
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db16,0.2,1757.2179590861003,15.682547276836093
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",db16,0.2,7.140036265055339,39.59379943255122
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym2,0.02,13.465391794840494,36.838613665172026
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym2,0.02,0.5570182800292969,50.672109129373
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym2,0.05,95.72348912556966,28.320618405842133
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym2,0.05,1.0228563944498699,48.032656963403554
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym2,0.1,399.5187174479167,22.115432300491307
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym2,0.1,2.8387362162272134,43.59955322396083
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym2,0.2,1632.3592389424641,16.00264619243142
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym2,0.2,10.248231252034506,38.02431444136219
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym8,0.02,13.889775594075521,36.70385131619998
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym8,0.02,0.5329742431640625,50.863741393122694
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym8,0.05,98.68204243977864,28.188422312870784
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym8,0.05,0.8498090108235677,48.837590291129956
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym8,0.1,411.77868270874023,21.984165009112896
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym8,0.1,2.134868621826172,44.837092068331046
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym8,0.2,1682.2560170491536,15.871882705173642
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym8,0.2,7.441417694091797,39.414246782698875
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym16,0.02,14.458910624186197,36.52944787669214
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym16,0.02,0.5297991434733073,50.889691090303614
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym16,0.05,102.53445688883464,28.02210525505505
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym16,0.05,0.8274205525716146,48.95354056590767
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym16,0.1,427.7659492492676,21.81874149687349
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym16,0.1,2.0479812622070312,45.01754382078432
+Lower Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym16,0.2,1747.104564666748,15.707614624683865
+Higher Band,lena_std.tif,qrcode_compact_512x512.tif,"(512, 512, 3)","(512, 512, 3)",sym16,0.2,7.103818257649739,39.6158851883913

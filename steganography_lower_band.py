@@ -244,81 +244,7 @@ def main(
         extracted_hidden_image, 15, "Extracted Hidden Image", rows, cols
     )
 
-    plt.show()
-
-    # 11) Apply the decoding transform to each channel of the stego image
-    # applying dwt to 3 stego channel images to get coeffs of stego image in R,G,B
-
-    # Psend_r = pywt.dwt2(processed_rgbr, decoding_wavelet)
-    # PcAr, (PcHr, PcVr, PcDr) = Psend_r
-
-    # Psend_g = pywt.dwt2(processed_rgbg, decoding_wavelet)
-    # PcAg, (PcHg, PcVg, PcDg) = Psend_g
-
-    # Psend_b = pywt.dwt2(processed_rgbb, decoding_wavelet)
-    # PcAb, (PcHb, PcVb, PcDb) = Psend_b
-
-    # # 12) Perform Singular Value Decomposition (SVD) on the stego image
-    # PPr, PDr, PQr = np.linalg.svd(PcAr, full_matrices=False)
-    # PPg, PDg, PQg = np.linalg.svd(PcAg, full_matrices=False)
-    # PPb, PDb, PQb = np.linalg.svd(PcAb, full_matrices=False)
-
-    # # 13) Reverse the information embedded in the 'D' parameter of the cover image in step 5 through the inverse operation
-    # # subtract from R,G,B channels values of cover image
-    # S_ewatr = (PDr - Dr) / 0.1
-    # S_ewatg = (PDg - Dg) / 0.1
-    # S_ewatb = (PDb - Db) / 0.1
-
-    # # 14) Combine the approximations with the hidden SVD values to reconstruct the hidden image
-    # ewatr = np.dot(P1r * S_ewatr, Q1r)
-    # ewatg = np.dot(P1g * S_ewatg, Q1g)
-    # ewatb = np.dot(P1b * S_ewatb, Q1b)
-
-    # # 15) Obtain the reconstructed hidden image, which consists of the color channels combined with the normalized SVD differences
-    # d = ewatr.astype(int)
-    # e = ewatg.astype(int)
-    # f = ewatb.astype(int)
-    # eimg = cv2.merge((d, e, f))
-
-    # # 16) Extract the horizontal, vertical, and diagonal coefficients from each RGB channel of the hidden image
-    # # coeffs of original hidden image except the new derived appproximation
-    # eproc_r = eimg[:, :, 0], (cHr1, cVr1, cDr1)
-    # eproc_g = eimg[:, :, 1], (cHg1, cVg1, cDg1)
-    # eproc_b = eimg[:, :, 2], (cHb1, cVb1, cDb1)
-
-    # # 17) Apply inverse transform to each channel of the image to generate the final hidden information image
-    # # hidden stego images get high res r,g,b seperate images/channels usign idwt
-    # eprocessed_rgbr = pywt.idwt2(eproc_r, decoding_wavelet)
-    # eprocessed_rgbg = pywt.idwt2(eproc_g, decoding_wavelet)
-    # eprocessed_rgbb = pywt.idwt2(eproc_b, decoding_wavelet)
-
-    # # just converting float to int prior to cv2.merge
-    # x1 = eprocessed_rgbr.astype(int)
-
-    # y1 = eprocessed_rgbg.astype(int)
-
-    # z1 = eprocessed_rgbb.astype(int)
-
-    # # 18) combine different high res r,g,b to get hidden image
-    # hidden_rgb = cv2.merge((x1, y1, z1))
-
-    # h1, w1, ch1 = hidden_rgb.shape
-
-    # plt.subplot(plot_rows, plot_columns, 15)
-    # plt.axis("off")
-    # plt.title("Decoded Hidden Image")
-    # plt.imshow(hidden_rgb, aspect="equal")
-
     # plt.show()
-    # plt.close()
-
-    # # save stego image to filesystem
-    # save_image_to_file(wimghd, "stego.tif", figsize=(float(w) / 100, float(h) / 100))
-
-    # # save decoded hidden image to filesystem
-    # save_image_to_file(
-    #     hidden_rgb, "hidden_rgb.tif", figsize=(float(w) / 100, float(h) / 100)
-    # )
 
     print(f"Cover image dimensions: {cover_image.shape}")
     print(f"Hidden image dimensions: {hidden_image.shape}")
@@ -339,6 +265,7 @@ def main(
         if not file_exists:
             writer.writerow(
                 [
+                    "Stego Strategy",
                     "Original Image",
                     "Stego Image",
                     "Original Image Dimensions",
@@ -351,6 +278,7 @@ def main(
             )
         writer.writerow(
             [
+                "Lower Band",
                 cover_image_path,
                 hidden_image_path,
                 cover_image.shape,

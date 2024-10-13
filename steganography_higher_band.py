@@ -316,6 +316,7 @@ def main(
         if not file_exists:
             writer.writerow(
                 [
+                    "Stego Strategy",
                     "Original Image",
                     "Stego Image",
                     "Original Image Dimensions",
@@ -328,6 +329,7 @@ def main(
             )
         writer.writerow(
             [
+                "Higher Band",
                 cover_image_path,
                 hidden_image_path,
                 cover_image.shape,
