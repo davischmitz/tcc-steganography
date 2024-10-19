@@ -52,6 +52,10 @@ def extract_hidden_svd(embedded_svd, cover_svd, scale):
     return (embedded_svd - cover_svd) / scale
 
 
+def extract_hidden_svd_without_cover(embedded_svd, scale):
+    return embedded_svd / scale
+
+
 def save_image(image, file_path, size=None):
     fig = plt.figure(frameon=False)
     if size is not None:
@@ -207,15 +211,15 @@ def main(
 
     # Extract hidden singular values by subtracting the cover image's singular values
     extracted_hidden_svd_red = [
-        extract_hidden_svd(stego_svd_red[i][1], cover_svd_red[i][1], embed_scale)
+        extract_hidden_svd_without_cover(stego_svd_red[i][1], embed_scale)
         for i in range(3)
     ]
     extracted_hidden_svd_green = [
-        extract_hidden_svd(stego_svd_green[i][1], cover_svd_green[i][1], embed_scale)
+        extract_hidden_svd_without_cover(stego_svd_green[i][1], embed_scale)
         for i in range(3)
     ]
     extracted_hidden_svd_blue = [
-        extract_hidden_svd(stego_svd_blue[i][1], cover_svd_blue[i][1], embed_scale)
+        extract_hidden_svd_without_cover(stego_svd_blue[i][1], embed_scale)
         for i in range(3)
     ]
 
