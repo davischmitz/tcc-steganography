@@ -42,8 +42,74 @@ def modify_high_freq_bands(cover_coeffs, hidden_coeffs, embed_scale):
     return [approx_cover] + modified_details
 
 
+def extract_hidden_image(
+    stego_image, cover_image, wavelet_type, embed_scale, dwt_level
+):
+    # Separate the RGB channels of both stego and cover images
+    stego_red, stego_green, stego_blue = (
+        stego_image[:, :, 0],
+        stego_image[:, :, 1],
+        stego_image[:, :, 2],
+    )
+    cover_red, cover_green, cover_blue = (
+        cover_image[:, :, 0],
+        cover_image[:, :, 1],
+        cover_image[:, :, 2],
+    )
+
+    # Perform multi-level DWT on the cover and stego image channels
+    stego_dwt_red = compute_multi_level_dwt(stego_red, wavelet_type, dwt_level)
+    stego_dwt_green = compute_multi_level_dwt(stego_green, wavelet_type, dwt_level)
+    stego_dwt_blue = compute_multi_level_dwt(stego_blue, wavelet_type, dwt_level)
+
+    cover_dwt_red = compute_multi_level_dwt(cover_red, wavelet_type, dwt_level)
+    cover_dwt_green = compute_multi_level_dwt(cover_green, wavelet_type, dwt_level)
+    cover_dwt_blue = compute_multi_level_dwt(cover_blue, wavelet_type, dwt_level)
+
+    # Extract hidden image high-frequency bands using inverse embedding logic
+    hidden_dwt_red = extract_high_freq_bands(stego_dwt_red, cover_dwt_red, embed_scale)
+    hidden_dwt_green = extract_high_freq_bands(
+        stego_dwt_green, cover_dwt_green, embed_scale
+    )
+    hidden_dwt_blue = extract_high_freq_bands(
+        stego_dwt_blue, cover_dwt_blue, embed_scale
+    )
+
+    # Perform Inverse DWT to get the hidden image from the extracted bands
+    hidden_red = compute_multi_level_idwt(hidden_dwt_red, wavelet_type)
+    hidden_green = compute_multi_level_idwt(hidden_dwt_green, wavelet_type)
+    hidden_blue = compute_multi_level_idwt(hidden_dwt_blue, wavelet_type)
+
+    # Merge hidden channels to form the extracted hidden image
+    hidden_image = cv2.merge(
+        (hidden_red.astype(int), hidden_green.astype(int), hidden_blue.astype(int))
+    )
+
+    return hidden_image
+
+
+def extract_high_freq_bands(stego_coeffs, cover_coeffs, embed_scale):
+    approx_cover, details_cover = cover_coeffs[0], cover_coeffs[1:]
+    approx_stego, details_stego = stego_coeffs[0], stego_coeffs[1:]
+
+    extracted_details = []
+    for stego_detail, cover_detail in zip(details_stego, details_cover):
+        extracted_bands = []
+        for stego_band, cover_band in zip(stego_detail, cover_detail):
+            # Apply SVD to both stego and cover bands
+            cover_svd = apply_svd(cover_band)
+            stego_svd = apply_svd(stego_band)
+            # Extract hidden SVD values
+            hidden_s = extract_hidden_svd(stego_svd[1], cover_svd[1], embed_scale)
+            # Reconstruct the hidden detail band
+            hidden_band = decode_svd(hidden_s, stego_svd[0], stego_svd[2])
+            extracted_bands.append(hidden_band)
+        extracted_details.append(tuple(extracted_bands))
+
+    return [approx_cover] + extracted_details
+
+
 def embed_svd(cover_svd, hidden_svd, scale):
-    """Embed hidden image's singular values into the cover image's SVD using a scale factor."""
     cover_u, cover_s, cover_vh = cover_svd
     hidden_u, hidden_s, hidden_vh = hidden_svd
     embedded_s = cover_s + scale * hidden_s
@@ -59,8 +125,13 @@ def decode_svd(embedded_matrix, u, vh):
     return np.dot(u * embedded_matrix, vh)
 
 
-def extract_hidden_svd(embedded_svd, scale):
-    return embedded_svd / scale
+def extract_hidden_svd(stego_s, cover_s, scale):
+    hidden_s = (stego_s - cover_s) / scale
+    return hidden_s
+
+
+# def extract_hidden_svd(embedded_svd, scale):
+#     return embedded_svd / scale
 
 
 def display_image_subplot(image, position, title, rows, cols):
@@ -68,14 +139,6 @@ def display_image_subplot(image, position, title, rows, cols):
     plt.axis("off")
     plt.title(title)
     plt.imshow(image, aspect="equal")
-
-
-def display_dwt_coefficients(coefficients, position_start, rows, cols, labels):
-    for i, coefficient in enumerate(coefficients):
-        plt.subplot(rows, cols, position_start + i)
-        plt.title(labels[i])
-        plt.axis("off")
-        plt.imshow(coefficient, interpolation="nearest", cmap=plt.cm.gray)
 
 
 def display_multi_level_dwt_coefficients(coefficients, max_level, label_levels):
@@ -106,40 +169,6 @@ def display_multi_level_dwt_coefficients(coefficients, max_level, label_levels):
 
     plt.tight_layout()
     plt.show()
-
-
-# def display_multi_level_dwt_coefficients(coefficients):
-#     pos = 1  # Initialize position for subplots
-
-#     # First element is the approximation (LL) at the highest level
-#     ll = coefficients[0]
-#     plt.subplot(len(coefficients), 4, pos)
-#     plt.title(f"Level {len(coefficients) - 1} Approximation (Low Freq)")
-#     plt.axis("off")
-#     plt.imshow(ll, interpolation="nearest", cmap=plt.cm.gray)
-#     pos += 4  # Move to the next row for detail coefficients
-
-#     # Remaining elements contain LH, HL, HH detail coefficients
-#     for level in range(1, len(coefficients)):
-#         lh, hl, hh = coefficients[level]  # Unpack the detail coefficients
-
-#         plt.subplot(len(coefficients), 4, pos)
-#         plt.title(f"Level {len(coefficients) - level} LH (High Freq)")
-#         plt.axis("off")
-#         plt.imshow(lh, interpolation="nearest", cmap=plt.cm.gray)
-#         pos += 1
-
-#         plt.subplot(len(coefficients), 4, pos)
-#         plt.title(f"Level {len(coefficients) - level} HL (High Freq)")
-#         plt.axis("off")
-#         plt.imshow(hl, interpolation="nearest", cmap=plt.cm.gray)
-#         pos += 1
-
-#         plt.subplot(len(coefficients), 4, pos)
-#         plt.title(f"Level {len(coefficients) - level} HH (High Freq)")
-#         plt.axis("off")
-#         plt.imshow(hh, interpolation="nearest", cmap=plt.cm.gray)
-#         pos += 1
 
 
 def save_image(image, file_path, size=None):
@@ -218,20 +247,6 @@ def main(
     hidden_dwt_green = compute_multi_level_dwt(hidden_green, wavelet_type, dwt_level)
     hidden_dwt_blue = compute_multi_level_dwt(hidden_blue, wavelet_type, dwt_level)
 
-    # # Apply DWT on RGB channels of both cover and hidden images
-    # cover_dwt_red = compute_dwt(cover_red, wavelet_type)
-    # cover_dwt_green = compute_dwt(cover_green, wavelet_type)
-    # cover_dwt_blue = compute_dwt(cover_blue, wavelet_type)
-
-    # hidden_dwt_red = compute_dwt(hidden_red, wavelet_type)
-    # hidden_dwt_green = compute_dwt(hidden_green, wavelet_type)
-    # hidden_dwt_blue = compute_dwt(hidden_blue, wavelet_type)
-
-    # Display DWT coefficients
-    # dwt_labels = ["Approximation", "Horizontal", "Vertical", "Diagonal"]
-    # display_dwt_coefficients(cover_dwt_red, 5, rows, cols, dwt_labels)
-    # display_dwt_coefficients(hidden_dwt_red, 9, rows, cols, dwt_labels)
-
     # Display the coefficients
     display_multi_level_dwt_coefficients(cover_dwt_red, dwt_level, dwt_level)
 
@@ -251,57 +266,6 @@ def main(
     stego_green = compute_multi_level_idwt(modified_dwt_green, wavelet_type)
     stego_blue = compute_multi_level_idwt(modified_dwt_blue, wavelet_type)
 
-    # # Apply SVD on the cover image's high-frequency bands (Horizontal, Vertical, Diagonal)
-    # cover_svd_red = [apply_svd(band) for band in cover_dwt_red[1:]]
-    # cover_svd_green = [apply_svd(band) for band in cover_dwt_green[1:]]
-    # cover_svd_blue = [apply_svd(band) for band in cover_dwt_blue[1:]]
-
-    # # Apply SVD on the hidden image's high-frequency bands
-    # hidden_svd_red = [apply_svd(band) for band in hidden_dwt_red[1:]]
-    # hidden_svd_green = [apply_svd(band) for band in hidden_dwt_green[1:]]
-    # hidden_svd_blue = [apply_svd(band) for band in hidden_dwt_blue[1:]]
-
-    # # Embed hidden image into cover image's SVD D values
-    # embedded_red = [
-    #     cover_svd_red[i][1] + embed_scale * hidden_svd_red[i][1] for i in range(3)
-    # ]
-    # embedded_green = [
-    #     cover_svd_green[i][1] + embed_scale * hidden_svd_green[i][1] for i in range(3)
-    # ]
-    # embedded_blue = [
-    #     cover_svd_blue[i][1] + embed_scale * hidden_svd_blue[i][1] for i in range(3)
-    # ]
-
-    # # Reconstruct DWT coefficients using embedded SVD data
-    # embedded_dwt_red = (
-    #     cover_dwt_red[0],
-    #     tuple(
-    #         np.dot(cover_svd_red[i][0] * embedded_red[i], cover_svd_red[i][2])
-    #         for i in range(3)
-    #     ),
-    # )
-    # embedded_dwt_green = (
-    #     cover_dwt_green[0],
-    #     tuple(
-    #         np.dot(cover_svd_green[i][0] * embedded_green[i], cover_svd_green[i][2])
-    #         for i in range(3)
-    #     ),
-    # )
-    # embedded_dwt_blue = (
-    #     cover_dwt_blue[0],
-    #     tuple(
-    #         np.dot(cover_svd_blue[i][0] * embedded_blue[i], cover_svd_blue[i][2])
-    #         for i in range(3)
-    #     ),
-    # )
-
-    # # Inverse DWT to get stego image
-    # stego_red = compute_idwt(embedded_dwt_red[0], embedded_dwt_red[1], wavelet_type)
-    # stego_green = compute_idwt(
-    #     embedded_dwt_green[0], embedded_dwt_green[1], wavelet_type
-    # )
-    # stego_blue = compute_idwt(embedded_dwt_blue[0], embedded_dwt_blue[1], wavelet_type)
-
     # Merge stego channels to form final stego image
     stego_image = cv2.merge(
         (stego_red.astype(int), stego_green.astype(int), stego_blue.astype(int))
@@ -314,86 +278,14 @@ def main(
     # DECODING PROCESS
     ####################################################
 
-    # # Apply DWT to the stego image to get the high-frequency bands
-    # stego_red_dwt = compute_dwt(stego_image[:, :, 0], wavelet_type)
-    # stego_green_dwt = compute_dwt(stego_image[:, :, 1], wavelet_type)
-    # stego_blue_dwt = compute_dwt(stego_image[:, :, 2], wavelet_type)
+    # Extract hidden image
+    extracted_hidden_image = extract_hidden_image(
+        stego_image, cover_image, wavelet_type, embed_scale, dwt_level
+    )
 
-    # # Apply SVD on the stego image's high-frequency bands
-    # stego_svd_red = [apply_svd(band) for band in stego_red_dwt[1:]]
-    # stego_svd_green = [apply_svd(band) for band in stego_green_dwt[1:]]
-    # stego_svd_blue = [apply_svd(band) for band in stego_blue_dwt[1:]]
+    # Display extracted hidden image
+    display_image_subplot(hidden_image, 15, "Extracted Hidden Image", rows, cols)
 
-    # # Extract hidden singular values by subtracting the cover image's singular values
-    # extracted_hidden_svd_red = [
-    #     extract_hidden_svd(stego_svd_red[i][1], embed_scale) for i in range(3)
-    # ]
-    # extracted_hidden_svd_green = [
-    #     extract_hidden_svd(stego_svd_green[i][1], embed_scale) for i in range(3)
-    # ]
-    # extracted_hidden_svd_blue = [
-    #     extract_hidden_svd(stego_svd_blue[i][1], embed_scale) for i in range(3)
-    # ]
-
-    # # Reconstruct the hidden image's DWT coefficients
-    # reconstructed_hidden_dwt_red = (
-    #     hidden_dwt_red[0],
-    #     tuple(
-    #         decode_svd(
-    #             extracted_hidden_svd_red[i], hidden_svd_red[i][0], hidden_svd_red[i][2]
-    #         )
-    #         for i in range(3)
-    #     ),
-    # )
-    # reconstructed_hidden_dwt_green = (
-    #     hidden_dwt_green[0],
-    #     tuple(
-    #         decode_svd(
-    #             extracted_hidden_svd_green[i],
-    #             hidden_svd_green[i][0],
-    #             hidden_svd_green[i][2],
-    #         )
-    #         for i in range(3)
-    #     ),
-    # )
-    # reconstructed_hidden_dwt_blue = (
-    #     hidden_dwt_blue[0],
-    #     tuple(
-    #         decode_svd(
-    #             extracted_hidden_svd_blue[i],
-    #             hidden_svd_blue[i][0],
-    #             hidden_svd_blue[i][2],
-    #         )
-    #         for i in range(3)
-    #     ),
-    # )
-
-    # # Perform Inverse DWT to get the extracted hidden image
-    # extracted_hidden_red = compute_idwt(
-    #     reconstructed_hidden_dwt_red[0], reconstructed_hidden_dwt_red[1], wavelet_type
-    # )
-    # extracted_hidden_green = compute_idwt(
-    #     reconstructed_hidden_dwt_green[0],
-    #     reconstructed_hidden_dwt_green[1],
-    #     wavelet_type,
-    # )
-    # extracted_hidden_blue = compute_idwt(
-    #     reconstructed_hidden_dwt_blue[0], reconstructed_hidden_dwt_blue[1], wavelet_type
-    # )
-
-    # # Merge RGB channels to form the extracted hidden image
-    # extracted_hidden_image = cv2.merge(
-    #     (
-    #         extracted_hidden_red.astype(int),
-    #         extracted_hidden_green.astype(int),
-    #         extracted_hidden_blue.astype(int),
-    #     )
-    # )
-
-    # # Display extracted hidden image
-    # display_image_subplot(
-    #     extracted_hidden_image, 15, "Extracted Hidden Image", rows, cols
-    # )
     plt.show()
 
     # Save stego image
@@ -403,15 +295,15 @@ def main(
         size=(float(stego_image.shape[1]) / 100, float(stego_image.shape[0]) / 100),
     )
 
-    # # Save extracted hidden image
-    # save_image(
-    #     extracted_hidden_image,
-    #     "extracted_hidden_image.tif",
-    #     size=(
-    #         float(extracted_hidden_image.shape[1]) / 100,
-    #         float(extracted_hidden_image.shape[0]) / 100,
-    #     ),
-    # )
+    # Save extracted hidden image
+    save_image(
+        extracted_hidden_image,
+        "extracted_hidden_image.tif",
+        size=(
+            float(extracted_hidden_image.shape[1]) / 100,
+            float(extracted_hidden_image.shape[0]) / 100,
+        ),
+    )
 
     print(f"Cover image dimensions: {cover_image.shape}")
     print(f"Hidden image dimensions: {hidden_image.shape}")
