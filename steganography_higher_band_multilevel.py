@@ -178,7 +178,7 @@ def save_image(image, file_path, size=None):
     ax = plt.Axes(fig, [0.0, 0.0, 1.0, 1.0])
     ax.set_axis_off()
     fig.add_axes(ax)
-    # ax.imshow(image, aspect="auto")
+    ax.imshow(image, aspect="auto")
     fig.savefig(file_path)
 
     ####################################################
@@ -203,8 +203,8 @@ def main(
     wavelet_type, embed_scale, cover_image_path, hidden_image_path, stego_image_path
 ):
     # Configuration
-    rows, cols = 6, 4
-    dwt_level = 2
+    rows, cols = 2, 2
+    dwt_level = 4
 
     # Load images
     cover_image = load_and_convert_to_rgb(cover_image_path)
@@ -217,10 +217,6 @@ def main(
     min_width = min(cover_image.shape[1], hidden_image.shape[1])
     cover_image = cover_image[:min_height, :min_width]
     hidden_image = hidden_image[:min_height, :min_width]
-
-    # Display cover and hidden images
-    display_image_subplot(cover_image, 2, "Cover Image", rows, cols)
-    display_image_subplot(hidden_image, 3, "Image to Hide", rows, cols)
 
     ####################################################
     # ENCODING PROCESS
@@ -271,9 +267,6 @@ def main(
         (stego_red.astype(int), stego_green.astype(int), stego_blue.astype(int))
     )
 
-    # Display stego image
-    display_image_subplot(stego_image, 14, "Stego Image", rows, cols)
-
     ####################################################
     # DECODING PROCESS
     ####################################################
@@ -283,8 +276,11 @@ def main(
         stego_image, cover_image, wavelet_type, embed_scale, dwt_level
     )
 
-    # Display extracted hidden image
-    display_image_subplot(hidden_image, 15, "Extracted Hidden Image", rows, cols)
+    # Display cover and hidden images
+    display_image_subplot(cover_image, 1, "Cover Image", rows, cols)
+    display_image_subplot(hidden_image, 2, "Image to Hide", rows, cols)
+    display_image_subplot(stego_image, 3, "Stego Image", rows, cols)
+    display_image_subplot(hidden_image, 4, "Extracted Hidden Image", rows, cols)
 
     plt.show()
 
