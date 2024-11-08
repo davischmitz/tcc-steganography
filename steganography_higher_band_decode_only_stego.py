@@ -350,7 +350,7 @@ def main(
     axes[1].set_title("Stego Image")
     axes[1].axis("off")
 
-    # plt.show()
+    plt.show()
 
 
 if __name__ == "__main__":
