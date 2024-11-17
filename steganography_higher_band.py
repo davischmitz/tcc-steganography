@@ -62,6 +62,60 @@ def save_image(image, file_path, size=None):
     ax.imshow(image, aspect="auto")
     fig.savefig(file_path)
 
+
+def plot_histograms_with_matplotlib(cover_image, stego_image):
+
+    # Ensure values are within 0 to 255 range
+    cover_image = np.clip(cover_image, 0, 255).astype(np.uint8)
+    stego_image = np.clip(stego_image, 0, 255).astype(np.uint8)
+
+    # Flatten the RGB channels for both images
+    cover_red, cover_green, cover_blue = (
+        cover_image[:, :, 0].flatten(),
+        cover_image[:, :, 1].flatten(),
+        cover_image[:, :, 2].flatten(),
+    )
+    stego_red, stego_green, stego_blue = (
+        stego_image[:, :, 0].flatten(),
+        stego_image[:, :, 1].flatten(),
+        stego_image[:, :, 2].flatten(),
+    )
+
+    # Define colors for the channels
+    colors = ["red", "green", "blue"]
+    cover_channels = [cover_red, cover_green, cover_blue]
+    stego_channels = [stego_red, stego_green, stego_blue]
+    channel_names = ["Red", "Green", "Blue"]
+
+    # Plot histograms for each channel
+    plt.figure(figsize=(18, 6))
+    for i in range(3):
+        plt.subplot(1, 3, i + 1)
+        plt.hist(
+            cover_channels[i],
+            bins=50,
+            color=colors[i],
+            alpha=0.5,
+            label="Cover",
+            density=True,
+        )
+        plt.hist(
+            stego_channels[i],
+            bins=50,
+            color=colors[i],
+            alpha=0.3,
+            label="Stego",
+            density=True,
+            linestyle="--",
+        )
+        plt.title(f"Histograma do Canal {channel_names[i]}")
+        plt.xlabel("Intensidade dos Pixels")
+        plt.ylabel("Densidade")
+        plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
     ####################################################
     # METRICS
     ####################################################
@@ -189,7 +243,7 @@ def main(
     )
 
     # Display stego image
-    display_image_subplot(stego_image, 14, "Stego Image", rows, cols)
+    display_image_subplot(stego_image, 14, "Imagem Stego", rows, cols)
 
     ####################################################
     # DECODING PROCESS
@@ -273,9 +327,11 @@ def main(
 
     # Display extracted hidden image
     display_image_subplot(
-        extracted_hidden_image, 15, "Extracted Hidden Image", rows, cols
+        extracted_hidden_image, 15, "Imagem Embedded extraída", rows, cols
     )
-    # plt.show()
+    plt.show()
+
+    plot_histograms_with_matplotlib(cover_image, stego_image)
 
     # Save stego image
     save_image(
@@ -301,8 +357,12 @@ def main(
     # Calculate MSE and PSNR
     mse_value = calculate_mse(cover_image, stego_image)
     psnr_value = calculate_psnr(cover_image, stego_image)
+    psnr_value_hidden_extracted = calculate_psnr(hidden_image, extracted_hidden_image)
     print(f"MSE between the original and stego image: {mse_value}")
     print(f"PSNR between the original and stego image: {psnr_value} dB")
+    print(
+        f"PSNR between the hidden and extracted hidden image: {psnr_value_hidden_extracted} dB"
+    )
 
     # Save results to a CSV file
     csv_filename = "image_metrics.csv"
@@ -321,7 +381,8 @@ def main(
                     "Wavelet",
                     "Embedding Scale",
                     "MSE",
-                    "PSNR",
+                    "PSNR between cover / stego",
+                    "PSNR between hidden / extracted",
                 ]
             )
         writer.writerow(
@@ -335,6 +396,7 @@ def main(
                 embed_scale,
                 mse_value,
                 psnr_value,
+                psnr_value_hidden_extracted,
             ]
         )
 
@@ -343,14 +405,14 @@ def main(
     # Compare cover and stego images
     fig, axes = plt.subplots(1, 2, figsize=(10, 5))
     axes[0].imshow(cover_image, cmap="gray")
-    axes[0].set_title("Original Image")
+    axes[0].set_title("Imagem Cover")
     axes[0].axis("off")
 
     axes[1].imshow(stego_image, cmap="gray")
-    axes[1].set_title("Stego Image")
+    axes[1].set_title("Imagem Stego")
     axes[1].axis("off")
 
-    # plt.show()
+    plt.show()
 
 
 if __name__ == "__main__":

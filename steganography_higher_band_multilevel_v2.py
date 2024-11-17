@@ -9,6 +9,7 @@ import csv
 import os
 import seaborn as sns
 import pandas as pd
+from skimage.transform import resize
 
 
 def load_and_convert_to_rgb(image_path):
@@ -140,19 +141,19 @@ def display_multi_level_dwt_coefficients(coefficients, max_level, label_levels):
             # First column: Show the original approximation coefficients (the LL coefficients)
             axes[0, 0].set_axis_off()  # No wavelet diagram for original image
             axes[1, 0].imshow(coefficients[0], cmap=plt.cm.gray)
-            axes[1, 0].set_title("Approximation (Level 0)")
+            axes[1, 0].set_title("Aproximação")
             axes[1, 0].set_axis_off()
             continue
         # First row: Wavelet decomposition structure
         draw_2d_wp_basis(
             shape, wavedec2_keys(level), ax=axes[0, level], label_levels=label_levels
         )
-        axes[0, level].set_title(f"{level} level decomposition")
+        axes[0, level].set_title(f"Decomposição nível {level}")
         # Second row: Show the coefficients for the current level
         coeffs = coefficients[: level + 1]  # Slice coefficients up to current level
         arr, slices = pywt.coeffs_to_array(coeffs)
         axes[1, level].imshow(arr, cmap=plt.cm.gray)
-        axes[1, level].set_title(f"Coefficients (Level {level})")
+        axes[1, level].set_title(f"Coeficientes (Nível {level})")
         axes[1, level].set_axis_off()
     plt.tight_layout()
     plt.show()
@@ -207,9 +208,9 @@ def plot_histograms(cover_image, stego_image):
             linestyle="--",
             linewidth=1.5,
         )
-        plt.title(f"{color} Channel Histogram")
-        plt.xlabel("Pixel Intensity")
-        plt.ylabel("Density")
+        plt.title(f"Histograma do Canal {color}")
+        plt.xlabel("Intensidade dos Pixels")
+        plt.ylabel("Densidade")
         plt.legend()
 
     plt.tight_layout()
@@ -217,6 +218,11 @@ def plot_histograms(cover_image, stego_image):
 
 
 def plot_histograms_with_matplotlib(cover_image, stego_image):
+
+    # Ensure values are within 0 to 255 range
+    cover_image = np.clip(cover_image, 0, 255).astype(np.uint8)
+    stego_image = np.clip(stego_image, 0, 255).astype(np.uint8)
+
     # Flatten the RGB channels for both images
     cover_red, cover_green, cover_blue = (
         cover_image[:, :, 0].flatten(),
@@ -256,9 +262,9 @@ def plot_histograms_with_matplotlib(cover_image, stego_image):
             density=True,
             linestyle="--",
         )
-        plt.title(f"{channel_names[i]} Channel Histogram")
-        plt.xlabel("Pixel Intensity")
-        plt.ylabel("Density")
+        plt.title(f"Histograma do Canal {channel_names[i]}")
+        plt.xlabel("Intensidade dos Pixels")
+        plt.ylabel("Densidade")
         plt.legend()
 
     plt.tight_layout()
@@ -307,6 +313,10 @@ def save_image(image, file_path, size=None):
 
 
 def calculate_mse(image1, image2):
+    # Resize image2 to match the shape of image1 only if shapes differ
+    if image1.shape != image2.shape:
+        image2 = resize(image2, image1.shape, anti_aliasing=True)
+    # Calculate MSE between image1 and (possibly resized) image2
     return np.mean((image1 - image2) ** 2)
 
 
@@ -320,11 +330,18 @@ def calculate_psnr(image1, image2):
 
 
 def main(
-    wavelet_type, embed_scale, cover_image_path, hidden_image_path, stego_image_path
+    wavelet_type,
+    embed_scale,
+    cover_image_path,
+    hidden_image_path,
+    stego_image_path,
+    encoding_dwt_level,
+    decoding_dwt_level,
 ):
     # Configuration
     rows, cols = 2, 2
-    dwt_level = 2
+    print(f"Encoding DWT level: {encoding_dwt_level}")
+    print(f"Decoding DWT level: {decoding_dwt_level}")
 
     # Load images
     cover_image = load_and_convert_to_rgb(cover_image_path)
@@ -355,17 +372,21 @@ def main(
     )
 
     # Apply multi-level DWT on RGB channels of both cover and hidden images
-    cover_dwt_red = multi_level_dwt(cover_red, wavelet_type, dwt_level)
-    cover_dwt_green = multi_level_dwt(cover_green, wavelet_type, dwt_level)
-    cover_dwt_blue = multi_level_dwt(cover_blue, wavelet_type, dwt_level)
+    cover_dwt_red = multi_level_dwt(cover_red, wavelet_type, encoding_dwt_level)
+    cover_dwt_green = multi_level_dwt(cover_green, wavelet_type, encoding_dwt_level)
+    cover_dwt_blue = multi_level_dwt(cover_blue, wavelet_type, encoding_dwt_level)
 
-    hidden_dwt_red = multi_level_dwt(hidden_red, wavelet_type, dwt_level)
-    hidden_dwt_green = multi_level_dwt(hidden_green, wavelet_type, dwt_level)
-    hidden_dwt_blue = multi_level_dwt(hidden_blue, wavelet_type, dwt_level)
+    hidden_dwt_red = multi_level_dwt(hidden_red, wavelet_type, encoding_dwt_level)
+    hidden_dwt_green = multi_level_dwt(hidden_green, wavelet_type, encoding_dwt_level)
+    hidden_dwt_blue = multi_level_dwt(hidden_blue, wavelet_type, encoding_dwt_level)
 
     # Display the coefficients
-    display_multi_level_dwt_coefficients(cover_dwt_red, dwt_level, dwt_level)
-    display_multi_level_dwt_coefficients(hidden_dwt_red, dwt_level, dwt_level)
+    display_multi_level_dwt_coefficients(
+        cover_dwt_red, encoding_dwt_level, encoding_dwt_level
+    )
+    display_multi_level_dwt_coefficients(
+        hidden_dwt_red, encoding_dwt_level, encoding_dwt_level
+    )
 
     # Embed hidden image into highest-level details, storing U matrices
     stego_dwt_red = embed_in_highest_level_only_details(
@@ -406,13 +427,13 @@ def main(
     )
 
     # Decompose each channel to multiple DWT levels
-    stego_dwt_red = multi_level_dwt(stego_red, wavelet_type, dwt_level)
-    stego_dwt_green = multi_level_dwt(stego_green, wavelet_type, dwt_level)
-    stego_dwt_blue = multi_level_dwt(stego_blue, wavelet_type, dwt_level)
+    stego_dwt_red = multi_level_dwt(stego_red, wavelet_type, decoding_dwt_level)
+    stego_dwt_green = multi_level_dwt(stego_green, wavelet_type, decoding_dwt_level)
+    stego_dwt_blue = multi_level_dwt(stego_blue, wavelet_type, decoding_dwt_level)
 
-    cover_dwt_red = multi_level_dwt(cover_red, wavelet_type, dwt_level)
-    cover_dwt_green = multi_level_dwt(cover_green, wavelet_type, dwt_level)
-    cover_dwt_blue = multi_level_dwt(cover_blue, wavelet_type, dwt_level)
+    cover_dwt_red = multi_level_dwt(cover_red, wavelet_type, decoding_dwt_level)
+    cover_dwt_green = multi_level_dwt(cover_green, wavelet_type, decoding_dwt_level)
+    cover_dwt_blue = multi_level_dwt(cover_blue, wavelet_type, decoding_dwt_level)
 
     # Extract hidden DWT coefficients for each RGB channel
     extracted_hidden_dwt_red = extract_from_highest_level_only_details(
@@ -440,11 +461,11 @@ def main(
     )
 
     # Display cover and hidden images
-    display_image_subplot(cover_image, 1, "Cover Image", rows, cols)
-    display_image_subplot(hidden_image, 2, "Image to Hide", rows, cols)
-    display_image_subplot(stego_image, 3, "Stego Image", rows, cols)
+    display_image_subplot(cover_image, 1, "Imagem Cover", rows, cols)
+    display_image_subplot(hidden_image, 2, "Imagem Embedded", rows, cols)
+    display_image_subplot(stego_image, 3, "Imagem Stego", rows, cols)
     display_image_subplot(
-        extracted_hidden_image, 4, "Extracted Hidden Image", rows, cols
+        extracted_hidden_image, 4, "Imagem Embedded extraída", rows, cols
     )
     plt.show()
 
@@ -474,8 +495,12 @@ def main(
     # Calculate MSE and PSNR
     mse_value = calculate_mse(cover_image, stego_image)
     psnr_value = calculate_psnr(cover_image, stego_image)
+    psnr_value_hidden_extracted = calculate_psnr(hidden_image, extracted_hidden_image)
     print(f"MSE between the original and stego image: {mse_value}")
     print(f"PSNR between the original and stego image: {psnr_value} dB")
+    print(
+        f"PSNR between the hidden and extracted hidden image: {psnr_value_hidden_extracted} dB"
+    )
 
     # Save results to a CSV file
     csv_filename = "image_metrics.csv"
@@ -494,7 +519,10 @@ def main(
                     "Wavelet",
                     "Embedding Scale",
                     "MSE",
-                    "PSNR",
+                    "PSNR between cover / stego",
+                    "PSNR between hidden / extracted",
+                    "DWT Level Embedding",
+                    "DWT Level Extraction",
                 ]
             )
         writer.writerow(
@@ -508,6 +536,9 @@ def main(
                 embed_scale,
                 mse_value,
                 psnr_value,
+                psnr_value_hidden_extracted,
+                encoding_dwt_level,
+                decoding_dwt_level,
             ]
         )
 
@@ -536,6 +567,18 @@ if __name__ == "__main__":
         required=True,
         help="Path to save the stego image.",
     )
+    parser.add_argument(
+        "--embed_dwt_level",
+        type=int,
+        required=True,
+        help="DWT level in which the embedding is performed.",
+    )
+    parser.add_argument(
+        "--extract_dwt_level",
+        type=int,
+        required=True,
+        help="DWT level in which the extraction is performed.",
+    )
     args = parser.parse_args()
 
     main(
@@ -544,4 +587,6 @@ if __name__ == "__main__":
         args.cover_image,
         args.hidden_image,
         args.stego_image,
+        args.embed_dwt_level,
+        args.extract_dwt_level,
     )
