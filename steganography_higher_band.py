@@ -154,7 +154,7 @@ def main(
 
     # Display cover and hidden images
     display_image_subplot(cover_image, 2, "Cover Image", rows, cols)
-    display_image_subplot(hidden_image, 3, "Image to Hide", rows, cols)
+    display_image_subplot(hidden_image, 3, "Embedded Image", rows, cols)
 
     ####################################################
     # ENCODING PROCESS
@@ -243,7 +243,7 @@ def main(
     )
 
     # Display stego image
-    display_image_subplot(stego_image, 14, "Imagem Stego", rows, cols)
+    display_image_subplot(stego_image, 14, "Stego Image", rows, cols)
 
     ####################################################
     # DECODING PROCESS
@@ -327,7 +327,7 @@ def main(
 
     # Display extracted hidden image
     display_image_subplot(
-        extracted_hidden_image, 15, "Imagem Embedded extraída", rows, cols
+        extracted_hidden_image, 15, "Extracted Embedded Image", rows, cols
     )
     plt.show()
 
@@ -405,11 +405,11 @@ def main(
     # Compare cover and stego images
     fig, axes = plt.subplots(1, 2, figsize=(10, 5))
     axes[0].imshow(cover_image, cmap="gray")
-    axes[0].set_title("Imagem Cover")
+    axes[0].set_title("Cover Image")
     axes[0].axis("off")
 
     axes[1].imshow(stego_image, cmap="gray")
-    axes[1].set_title("Imagem Stego")
+    axes[1].set_title("Stego Image")
     axes[1].axis("off")
 
     plt.show()

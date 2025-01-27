@@ -152,8 +152,8 @@ def main(
     hidden_image = hidden_image[:min_height, :min_width]
 
     # Display cover and hidden images
-    display_image_subplot(cover_image, 2, "Imagem Cover", rows, cols)
-    display_image_subplot(hidden_image, 3, "Imagem Embedded", rows, cols)
+    display_image_subplot(cover_image, 2, "Cover Image", rows, cols)
+    display_image_subplot(hidden_image, 3, "Embedded Image", rows, cols)
 
     ####################################################
     # ENCODING PROCESS
@@ -182,10 +182,10 @@ def main(
 
     # Display DWT coefficients
     dwt_labels = [
-        "Aproximação",
-        "Detalhes Horizontais",
-        "Detalhes Verticais",
-        "Detalhes Diagonais",
+        "Aproximation (LL)",
+        "Horizontal Details (LH)",
+        "Vertical Details (HL)",
+        "Diagonal Details (HH)",
     ]
     display_dwt_coefficients(cover_dwt_red, 5, rows, cols, dwt_labels)
     display_dwt_coefficients(hidden_dwt_red, 9, rows, cols, dwt_labels)
@@ -232,7 +232,7 @@ def main(
     )
 
     # Display stego image
-    display_image_subplot(stego_image, 14, "Imagem Stego", rows, cols)
+    display_image_subplot(stego_image, 14, "Stego Image", rows, cols)
 
     ####################################################
     # DECODING PROCESS
@@ -299,7 +299,7 @@ def main(
 
     # Display extracted hidden image
     display_image_subplot(
-        extracted_hidden_image, 15, "Imagem Embedded extraída", rows, cols
+        extracted_hidden_image, 15, "Extracted Embedded Image", rows, cols
     )
 
     plot_histograms_with_matplotlib(cover_image, stego_image)
@@ -361,11 +361,11 @@ def main(
     # Compare cover and stego images
     fig, axes = plt.subplots(1, 2, figsize=(10, 5))
     axes[0].imshow(cover_image, cmap="gray")
-    axes[0].set_title("Imagem Cover")
+    axes[0].set_title("Cover Image")
     axes[0].axis("off")
 
     axes[1].imshow(stego_image, cmap="gray")
-    axes[1].set_title("Imagem Stego")
+    axes[1].set_title("Stego Image")
     axes[1].axis("off")
 
     plt.show()

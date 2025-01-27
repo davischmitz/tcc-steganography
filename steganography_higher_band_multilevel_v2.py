@@ -141,19 +141,19 @@ def display_multi_level_dwt_coefficients(coefficients, max_level, label_levels):
             # First column: Show the original approximation coefficients (the LL coefficients)
             axes[0, 0].set_axis_off()  # No wavelet diagram for original image
             axes[1, 0].imshow(coefficients[0], cmap=plt.cm.gray)
-            axes[1, 0].set_title("Aproximação")
+            axes[1, 0].set_title("Aproximation (LL)")
             axes[1, 0].set_axis_off()
             continue
         # First row: Wavelet decomposition structure
         draw_2d_wp_basis(
             shape, wavedec2_keys(level), ax=axes[0, level], label_levels=label_levels
         )
-        axes[0, level].set_title(f"Decomposição nível {level}")
+        axes[0, level].set_title(f"Coefficients (Level {level})")
         # Second row: Show the coefficients for the current level
         coeffs = coefficients[: level + 1]  # Slice coefficients up to current level
         arr, slices = pywt.coeffs_to_array(coeffs)
         axes[1, level].imshow(arr, cmap=plt.cm.gray)
-        axes[1, level].set_title(f"Coeficientes (Nível {level})")
+        axes[1, level].set_title(f"Coefficients (Level {level})")
         axes[1, level].set_axis_off()
     plt.tight_layout()
     plt.show()
@@ -461,11 +461,11 @@ def main(
     )
 
     # Display cover and hidden images
-    display_image_subplot(cover_image, 1, "Imagem Cover", rows, cols)
-    display_image_subplot(hidden_image, 2, "Imagem Embedded", rows, cols)
-    display_image_subplot(stego_image, 3, "Imagem Stego", rows, cols)
+    display_image_subplot(cover_image, 1, "Cover Image", rows, cols)
+    display_image_subplot(hidden_image, 2, "Embedded Image", rows, cols)
+    display_image_subplot(stego_image, 3, "Stego Image", rows, cols)
     display_image_subplot(
-        extracted_hidden_image, 4, "Imagem Embedded extraída", rows, cols
+        extracted_hidden_image, 4, "Extracted Embedded Image", rows, cols
     )
     plt.show()
 
@@ -543,6 +543,18 @@ def main(
         )
 
     print(f"Results saved to {csv_filename}")
+
+        # Compare cover and stego images
+    fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+    axes[0].imshow(cover_image, cmap="gray")
+    axes[0].set_title("Cover Image")
+    axes[0].axis("off")
+
+    axes[1].imshow(stego_image, cmap="gray")
+    axes[1].set_title("Stego Image")
+    axes[1].axis("off")
+
+    plt.show()
 
 
 if __name__ == "__main__":
