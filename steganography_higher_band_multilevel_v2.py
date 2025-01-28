@@ -10,6 +10,7 @@ import os
 import seaborn as sns
 import pandas as pd
 from skimage.transform import resize
+from itertools import product
 
 
 def load_and_convert_to_rgb(image_path):
@@ -145,8 +146,9 @@ def display_multi_level_dwt_coefficients(coefficients, max_level, label_levels):
             axes[1, 0].set_axis_off()
             continue
         # First row: Wavelet decomposition structure
+        keys = list(product(['LL', 'HH', 'LH', 'HL'], repeat=max_level))
         draw_2d_wp_basis(
-            shape, wavedec2_keys(level), ax=axes[0, level], label_levels=label_levels
+            shape, keys, ax=axes[0, level], label_levels=label_levels
         )
         axes[0, level].set_title(f"Coefficients (Level {level})")
         # Second row: Show the coefficients for the current level
